@@ -1,0 +1,15 @@
+[
+  {
+    "direction": "in",
+    "authLevel": "anonymous",
+    "type": "httpTrigger",
+    "methods": ["post"],
+    "name": "req",
+    "route": "signup"
+  },
+  {
+    "direction": "out",
+    "type": "http",
+    "name": "res"
+  }
+]
