@@ -35,10 +35,10 @@ function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-black flex flex-col items-center justify-center overflow-hidden">
+    <div className="relative min-h-screen bg-black flex flex-col items-center justify-end overflow-hidden">
       {/* Background video loop (muted, no controls = acts like a GIF) */}
       <video
-        className="absolute inset-0 w-full h-full object-cover opacity-40"
+        className="absolute top-1/2 left-1/2 w-[200%] h-[200%] object-contain opacity-40 -translate-x-1/2 -translate-y-1/2"
         src={splashVideo}
         autoPlay
         loop
@@ -47,16 +47,11 @@ function App() {
       />
 
       {/* Content overlay */}
-      <div className="relative z-10 flex flex-col items-center justify-center px-6 text-center">
-        {/* Band logo */}
-        <img
-          src="/droplift-logo.png"
-          alt="Droplift"
-          className="w-64 md:w-96 mb-2 drop-shadow-lg"
-        />
-        <p className="text-lg md:text-xl text-gray-400 tracking-[0.3em] uppercase mb-12">
-          Post-Grunge
-        </p>
+      <div className="relative z-10 flex flex-col items-center px-6 text-center pb-12">
+        {/* Teaser text */}
+        <h1 className="text-2xl md:text-4xl text-white tracking-widest drop-shadow-lg mb-12" style={{ fontFamily: "'Special Elite', cursive" }}>
+          Something&apos;s Coming Undone... March 20, 2026
+        </h1>
 
         {/* Email signup */}
         <div className="w-full max-w-md">
