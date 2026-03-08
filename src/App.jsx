@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const splashVideo = '/droplift-splash.mov';
 
@@ -10,6 +11,13 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email) return;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setStatus('error');
+      setMessage('Please enter a valid email address.');
+      return;
+    }
 
     setStatus('submitting');
     try {
@@ -85,7 +93,8 @@ function App() {
         </div>
 
         {/* Contact */}
-        <div className="mt-10">
+        {/* Contact & Store links */}
+        <div className="mt-10 flex flex-col sm:flex-row items-center gap-6">
           <a
             href="https://www.facebook.com/dropliftband/"
             target="_blank"
@@ -97,6 +106,13 @@ function App() {
             </svg>
             Message us on Facebook
           </a>
+          <span className="hidden sm:inline text-gray-600">|</span>
+          <Link
+            to="/store"
+            className="text-gray-400 hover:text-brand-orange transition-colors text-sm uppercase tracking-widest"
+          >
+            Store
+          </Link>
         </div>
       </div>
 

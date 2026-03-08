@@ -2,7 +2,9 @@
   "name": "droplift-api",
   "version": "1.0.0",
   "private": true,
+  "main": "src/functions/*.js",
   "dependencies": {
+    "@azure/functions": "^4.6.0",
     "mssql": "^11.0.1",
     "stripe": "^20.4.1"
   }

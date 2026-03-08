@@ -1,16 +1,5 @@
 const { app } = require('@azure/functions');
-const sql = require('mssql');
-
-const sqlConfig = {
-  server: process.env.SQL_SERVER,
-  database: process.env.SQL_DATABASE,
-  user: process.env.SQL_USER,
-  password: process.env.SQL_PASSWORD,
-  options: {
-    encrypt: true,
-    trustServerCertificate: false,
-  },
-};
+const Stripe = require('stripe');
 
 app.http('products', {
   methods: ['GET'],
@@ -18,15 +7,42 @@ app.http('products', {
   route: 'products',
   handler: async (request, context) => {
     try {
-      const pool = await sql.connect(sqlConfig);
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-      const result = await pool
-        .request()
-        .query('SELECT Id, Name, Description, PriceInCents, StripePriceId, ImageUrl FROM Products WHERE IsActive = 1 ORDER BY CreatedAt DESC');
+      // Fetch active products
+      const products = await stripe.products.list({ active: true });
+
+      // Fetch all active prices and group by product
+      const prices = await stripe.prices.list({ active: true, limit: 100 });
+
+      const pricesByProduct = {};
+      for (const price of prices.data) {
+        const pid = price.product;
+        if (!pricesByProduct[pid]) pricesByProduct[pid] = [];
+        pricesByProduct[pid].push({
+          priceId: price.id,
+          priceCents: price.unit_amount,
+          currency: price.currency,
+          label: price.nickname || null,
+        });
+      }
+
+      const items = products.data.map((product) => {
+        const productPrices = pricesByProduct[product.id] || [];
+        // Sort by price ascending
+        productPrices.sort((a, b) => a.priceCents - b.priceCents);
+        return {
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          image: product.images?.[0] || null,
+          prices: productPrices,
+        };
+      });
 
       return {
         status: 200,
-        jsonBody: result.recordset,
+        jsonBody: items,
       };
     } catch (err) {
       context.log('Products error:', err.message);
