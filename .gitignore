@@ -10,7 +10,7 @@ dist/
 api/local.settings.json
 
 # Editor
-.vscode/
+
 *.swp
 *.swo
 .DS_Store

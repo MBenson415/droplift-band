@@ -24,10 +24,14 @@ app.http('checkout', {
         quantity: item.quantity || 1,
       }));
 
+      // Determine mode by checking if the price is recurring (subscription)
+      const firstPrice = await stripe.prices.retrieve(items[0].stripePriceId);
+      const mode = firstPrice.recurring ? 'subscription' : 'payment';
+
       const origin = request.headers.get('origin') || 'https://dropliftband.com';
 
       const session = await stripe.checkout.sessions.create({
-        mode: 'payment',
+        mode,
         line_items: lineItems,
         success_url: `${origin}/store?success=true`,
         cancel_url: `${origin}/store?canceled=true`,

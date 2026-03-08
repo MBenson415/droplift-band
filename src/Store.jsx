@@ -73,6 +73,8 @@ function Store() {
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        setCheckingOut(false);
       }
     } catch {
       setCheckingOut(false);
