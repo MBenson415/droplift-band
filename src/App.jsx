@@ -66,6 +66,7 @@ function App() {
           {status === 'success' ? (
             <div className="border border-brand-orange rounded-lg p-6">
               <p className="text-brand-orange text-lg font-semibold">{message}</p>
+              <p className="text-gray-400 text-sm mt-2">Check your email to confirm your signup.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
