@@ -2,9 +2,15 @@
   "name": "droplift-band",
   "private": true,
   "version": "1.0.0",
+  "engines": {
+    "node": "20.x"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "cd api && func host start",
+    "dev:swa": "wait-on tcp:5173 tcp:7071 && swa start http://localhost:5173 --api-devserver-url http://localhost:7071 --swa-config-location .",
+    "dev:local": "concurrently -k -n app,api,swa -c cyan,yellow,magenta \"npm:dev\" \"npm:dev:api\" \"npm:dev:swa\"",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -14,10 +20,13 @@
     "react-router-dom": "^7.13.1"
   },
   "devDependencies": {
+    "@azure/static-web-apps-cli": "^2.0.8",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
-    "vite": "^6.0.5"
+    "vite": "^6.0.5",
+    "wait-on": "^8.0.3"
   }
 }

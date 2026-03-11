@@ -17,3 +17,6 @@ api/local.settings.json
 
 # Logs
 *.log
+
+# Private downloads (MP3s)
+api/private/

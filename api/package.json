@@ -2,6 +2,9 @@
   "name": "droplift-api",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "main": "src/functions/*.js",
   "dependencies": {
     "@azure/functions": "^4.6.0",
