@@ -97,7 +97,8 @@ function confirmationEmail(confirmUrl, unsubscribeUrl) {
   return { text, html };
 }
 
-function downloadEmail(downloadUrl, expiresAt) {
+function downloadEmail(downloadUrl, expiresAt, options = {}) {
+  const thankYouLine = options.thankYouLine || 'Thank you for helping us grow!';
   const expiry = new Date(expiresAt).toLocaleDateString('en-US', {
     month: 'long', day: 'numeric', year: 'numeric',
   });
@@ -115,7 +116,8 @@ function downloadEmail(downloadUrl, expiresAt) {
   const text = [
     'DROPLIFT',
     '',
-    'Here\u2019s your digital download of Undone. Thank you for helping us grow!',
+    'Here\u2019s your digital download of Undone.',
+    thankYouLine,
     '',
     `Download: ${downloadUrl}`,
     '',
@@ -154,7 +156,7 @@ function downloadEmail(downloadUrl, expiresAt) {
         <tr>
           <td style="padding-bottom:32px;">
             <p style="margin:0;font-size:16px;line-height:26px;color:#333333;text-align:center;">
-              Here\u2019s your digital download of Undone. Thank you for helping us grow!
+              Here\u2019s your digital download of Undone. ${thankYouLine}
             </p>
           </td>
         </tr>

@@ -1,8 +1,5 @@
 const { app } = require('@azure/functions');
-const crypto = require('crypto');
-const { sql, getPool } = require('../shared/db');
-const { createTransporter } = require('../shared/mailer');
-const { downloadEmail } = require('../shared/emailTemplates');
+const { sendDownloadDelivery } = require('../shared/downloadDelivery');
 
 app.http('generateDownload', {
   methods: ['POST'],
@@ -33,32 +30,10 @@ app.http('generateDownload', {
       const maxUses = body?.maxUses || 5;
       const expiryHours = body?.expiryHours || 72;
 
-      const token = crypto.randomBytes(32).toString('base64url');
-      const expiresAt = new Date(Date.now() + expiryHours * 60 * 60 * 1000);
-
-      const pool = await getPool();
-      await pool
-        .request()
-        .input('email', sql.NVarChar(320), email)
-        .input('token', sql.NVarChar(64), token)
-        .input('maxUses', sql.Int, maxUses)
-        .input('expiresAt', sql.DateTime2, expiresAt)
-        .query(`INSERT INTO DropliftDownloadTokens (Email, Token, MaxUses, ExpiresAt)
-                VALUES (@email, @token, @maxUses, @expiresAt)`);
-
-      const baseUrl = process.env.SITE_URL || 'https://dropliftband.com';
-      const downloadUrl = `${baseUrl}/api/download?token=${token}`;
-
-      // Send the download link via email
-      const { text, html, attachments } = downloadEmail(downloadUrl, expiresAt);
-      const transporter = createTransporter();
-      await transporter.sendMail({
-        from: `"Droplift" <${process.env.SMTP_USER}>`,
-        to: email,
-        subject: 'Your Exclusive Download: Droplift - Undone',
-        text,
-        html,
-        attachments,
+      const { downloadUrl, expiresAt } = await sendDownloadDelivery({
+        email,
+        maxUses,
+        expiryHours,
       });
 
       return {

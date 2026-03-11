@@ -1,6 +1,11 @@
 const { app } = require('@azure/functions');
 const Stripe = require('stripe');
 
+const SINGLE_QUANTITY_PRODUCT_IDS = new Set([
+  'prod_U7x7gwYAOpgdlb',
+  'prod_U72c5PgkFc1tPi',
+]);
+
 app.http('checkout', {
   methods: ['POST'],
   authLevel: 'anonymous',
@@ -18,14 +23,25 @@ app.http('checkout', {
         };
       }
 
-      // Build line items from cart — each item needs { stripePriceId, quantity }
-      const lineItems = items.map((item) => ({
-        price: item.stripePriceId,
-        quantity: item.quantity || 1,
-      }));
+      const prices = await Promise.all(
+        items.map((item) => stripe.prices.retrieve(item.stripePriceId, { expand: ['product'] }))
+      );
+
+      // Build line items from cart and clamp quantity for restricted products.
+      const lineItems = items.map((item, index) => {
+        const price = prices[index];
+        const product = price.product;
+        const productId = typeof product === 'string' ? product : product?.id;
+        const requestedQuantity = Math.max(1, Number(item.quantity) || 1);
+
+        return {
+          price: item.stripePriceId,
+          quantity: SINGLE_QUANTITY_PRODUCT_IDS.has(productId) ? 1 : requestedQuantity,
+        };
+      });
 
       // Determine mode by checking if the price is recurring (subscription)
-      const firstPrice = await stripe.prices.retrieve(items[0].stripePriceId);
+      const firstPrice = prices[0];
       const mode = firstPrice.recurring ? 'subscription' : 'payment';
 
       const origin = request.headers.get('origin') || 'https://dropliftband.com';
