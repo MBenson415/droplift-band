@@ -37,6 +37,7 @@ app.http('checkout', {
         return {
           price: item.stripePriceId,
           quantity: SINGLE_QUANTITY_PRODUCT_IDS.has(productId) ? 1 : requestedQuantity,
+          ...(item.metadata ? { metadata: item.metadata } : {}),
         };
       });
 
@@ -46,12 +47,25 @@ app.http('checkout', {
 
       const origin = request.headers.get('origin') || 'https://dropliftband.com';
 
-      const session = await stripe.checkout.sessions.create({
+      // Build order summary metadata for the PaymentIntent (visible in Stripe dashboard)
+      const orderMetadata = {};
+      items.forEach((item, i) => {
+        const label = item.metadata?.size ? `${item.metadata.name} (${item.metadata.size})` : item.metadata?.name;
+        if (label) orderMetadata[`item_${i + 1}`] = `${label} x${lineItems[i].quantity}`;
+      });
+
+      const sessionParams = {
         mode,
         line_items: lineItems,
         success_url: `${origin}/store?success=true`,
         cancel_url: `${origin}/store?canceled=true`,
-      });
+      };
+
+      if (mode === 'payment' && Object.keys(orderMetadata).length > 0) {
+        sessionParams.payment_intent_data = { metadata: orderMetadata };
+      }
+
+      const session = await stripe.checkout.sessions.create(sessionParams);
 
       return {
         status: 200,

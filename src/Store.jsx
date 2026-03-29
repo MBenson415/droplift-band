@@ -99,6 +99,10 @@ function Store() {
           items: cart.map((item) => ({
             stripePriceId: item.priceId,
             quantity: item.quantity,
+            metadata: {
+              name: item.name,
+              size: item.sizeLabel,
+            },
           })),
         }),
       });
