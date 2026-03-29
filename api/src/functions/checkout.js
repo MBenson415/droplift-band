@@ -65,6 +65,10 @@ app.http('checkout', {
         sessionParams.payment_intent_data = { metadata: orderMetadata };
       }
 
+      if (mode === 'payment') {
+        sessionParams.shipping_address_collection = { allowed_countries: ['US', 'CA'] };
+      }
+
       const session = await stripe.checkout.sessions.create(sessionParams);
 
       return {
