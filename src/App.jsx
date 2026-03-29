@@ -1,53 +1,46 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const splashVideo = '/droplift-splash.mov';
+import SiteFooter from './SiteFooter';
 
 function App() {
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState('idle'); // idle | submitting | success | error
-  const [message, setMessage] = useState('');
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email) return;
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      setStatus('error');
-      setMessage('Please enter a valid email address.');
-      return;
-    }
-
-    setStatus('submitting');
-    try {
-      const res = await fetch('/api/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (res.ok) {
-        setStatus('success');
-        setMessage("You're on the list.");
-        setEmail('');
-      } else {
-        const data = await res.json().catch(() => ({}));
-        setStatus('error');
-        setMessage(data.error || 'Something went wrong. Try again.');
-      }
-    } catch {
-      setStatus('error');
-      setMessage('Connection failed. Try again.');
-    }
-  };
 
   return (
-    <div className="relative min-h-screen bg-black flex flex-col items-center justify-end overflow-hidden">
+    <div className="relative min-h-screen bg-black flex flex-col overflow-hidden">
+      {/* Nav bar */}
+      <header className="relative z-20 border-b border-gray-800 px-6 py-4 grid grid-cols-3 items-center bg-gradient-to-r from-red-700 to-brand-orange">
+        <span className="text-white font-black text-2xl tracking-widest uppercase">Droplift</span>
+        <nav className="flex items-center justify-center gap-6">
+          <Link
+            to="/about"
+            className="text-white/80 hover:text-white text-sm uppercase tracking-wider transition-colors"
+          >
+            About
+          </Link>
+          <Link
+            to="/shows"
+            className="text-white/80 hover:text-white text-sm uppercase tracking-wider transition-colors"
+          >
+            Shows
+          </Link>
+          <Link
+            to="/store"
+            className="text-white/80 hover:text-white text-sm uppercase tracking-wider transition-colors"
+          >
+            Store
+          </Link>
+          <Link
+            to="/contact"
+            className="text-white/80 hover:text-white text-sm uppercase tracking-wider transition-colors"
+          >
+            Contact
+          </Link>
+        </nav>
+        <div />
+      </header>
+
       {/* Background video loop (muted, no controls = acts like a GIF) */}
       <video
         className="absolute top-1/2 left-1/2 w-[200%] h-[200%] object-contain opacity-40 -translate-x-1/2 -translate-y-1/2"
-        src={splashVideo}
+        src="/undone-canvas.mp4"
         autoPlay
         loop
         muted
@@ -55,70 +48,68 @@ function App() {
       />
 
       {/* Content overlay */}
-      <div className="relative z-10 flex flex-col items-center px-6 text-center pb-12">
-        {/* Teaser text */}
-        <h1 className="text-2xl md:text-4xl text-white tracking-widest drop-shadow-lg mb-12" style={{ fontFamily: "'Special Elite', cursive" }}>
-          Something&apos;s Coming Undone... March 20, 2026
+      <div className="relative z-10 flex flex-col items-center px-6 text-center py-12">
+        {/* New single announcement */}
+        <h1 className="text-2xl md:text-3xl text-white tracking-widest drop-shadow-lg mb-12" style={{ fontFamily: "'Special Elite', cursive" }}>
+          New single &ldquo;Undone&rdquo; out now
         </h1>
 
-        {/* Email signup */}
-        <div className="w-full max-w-md">
-          {status === 'success' ? (
-            <div className="border border-brand-orange rounded-lg p-6">
-              <p className="text-brand-orange text-lg font-semibold">{message}</p>
-              <p className="text-gray-400 text-sm mt-2">Check your email to confirm your signup.</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 bg-black/80 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-brand-orange transition-colors"
-                disabled={status === 'submitting'}
-              />
-              <button
-                type="submit"
-                disabled={status === 'submitting'}
-                className="px-6 py-3 bg-brand-orange text-black font-bold uppercase tracking-wider rounded-lg hover:bg-brand-orange-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {status === 'submitting' ? '...' : 'Sign Up'}
-              </button>
-            </form>
-          )}
-          {status === 'error' && (
-            <p className="mt-3 text-red-500 text-sm">{message}</p>
-          )}
+        {/* Looping canvas video */}
+        <div className="mb-6 w-full max-w-xs rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+          <img
+            src="https://squarespacemusic.blob.core.windows.net/$web/Droplift_-_Undone (1).png"
+            alt="Undone single artwork"
+            className="w-full h-full object-cover"
+          />
         </div>
 
-        {/* Contact */}
-        {/* Contact & Store links */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center gap-6">
+        {/* Streaming platform buttons */}
+        <div className="flex flex-col items-stretch w-full max-w-xs gap-3 mb-10">
+          {/* Spotify */}
           <a
-            href="https://www.facebook.com/dropliftband/"
+            href="https://open.spotify.com/track/7A3Q5jod99jExmwl1tNost?si=9a277201130d43d9"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-brand-orange transition-colors text-sm uppercase tracking-widest"
+            className="inline-flex items-center gap-3 px-5 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white font-bold text-sm uppercase tracking-wider hover:border-gray-500 hover:bg-gray-800 transition-all"
           >
-            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            <svg className="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
             </svg>
-            Message us on Facebook
+            Spotify
           </a>
-          <span className="hidden sm:inline text-gray-600">|</span>
-          <Link
-            to="/store"
-            className="text-gray-400 hover:text-brand-orange transition-colors text-sm uppercase tracking-widest"
+
+          {/* Apple Music */}
+          <a
+            href="https://music.apple.com/us/album/undone/1882234025?i=1882234028"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-5 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white font-bold text-sm uppercase tracking-wider hover:border-gray-500 hover:bg-gray-800 transition-all"
           >
-            Store
-          </Link>
+            <svg className="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8.878 13.677c-1.59.546-2.668 2.032-2.668 3.697 0 1.804 1.289 2.626 2.803 2.626 1.514 0 2.514-.76 2.935-2.27l.019-.054V6.18l5.47-1.578v6.84c-1.59.546-2.668 2.032-2.668 3.697 0 1.804 1.289 2.626 2.803 2.626s2.514-.76 2.935-2.27l.019-.054V2.527L8.878 5.086v8.591z"/>
+            </svg>
+            Apple Music
+          </a>
+
+          {/* YouTube */}
+          <a
+            href="https://youtu.be/9A2jUPzl_aI?si=5UTB8RuGAF8zH1Tv"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-5 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white font-bold text-sm uppercase tracking-wider hover:border-gray-500 hover:bg-gray-800 transition-all"
+          >
+            <svg className="w-5 h-5 fill-current flex-shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            YouTube
+          </a>
         </div>
+
       </div>
 
       {/* Bottom fade gradient */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent z-[5]" />
+      <SiteFooter />
     </div>
   );
 }

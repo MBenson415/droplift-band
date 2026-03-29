@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import SiteFooter from './SiteFooter';
 
 const SIZE_ORDER = {
   small: 0,
@@ -116,16 +117,28 @@ function Store() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="border-b border-gray-800 px-6 py-4 flex items-center justify-between bg-gradient-to-r from-red-700 to-brand-orange">
+      <header className="border-b border-gray-800 px-6 py-4 grid grid-cols-3 items-center bg-gradient-to-r from-red-700 to-brand-orange">
         <Link to="/" className="text-white font-black text-2xl tracking-widest uppercase">
           Droplift
         </Link>
-        <div className="text-white/80 text-sm uppercase tracking-wider">
-          Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})
-        </div>
+        <nav className="flex items-center justify-center gap-6">
+          <Link to="/about" className="text-white/80 hover:text-white text-sm uppercase tracking-wider transition-colors">
+            About
+          </Link>
+          <Link to="/shows" className="text-white/80 hover:text-white text-sm uppercase tracking-wider transition-colors">
+            Shows
+          </Link>
+          <Link to="/contact" className="text-white/80 hover:text-white text-sm uppercase tracking-wider transition-colors">
+            Contact
+          </Link>
+          <div className="text-white/80 text-sm uppercase tracking-wider whitespace-nowrap">
+            Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})
+          </div>
+        </nav>
+        <div />
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      <main className="max-w-4xl mx-auto px-6 py-12">
         <h1 className="text-4xl text-brand-orange tracking-wider mb-8" style={{ fontFamily: "'Special Elite', cursive" }}>Merchandise</h1>
 
         {/* Success / Cancel banners */}
@@ -146,10 +159,13 @@ function Store() {
           <p className="text-gray-500">No merch available yet. Check back soon.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product) => {
+            {[...products].sort((a, b) => {
+              const aOrder = isNaN(a.storeOrder) ? Number.MAX_SAFE_INTEGER : a.storeOrder;
+              const bOrder = isNaN(b.storeOrder) ? Number.MAX_SAFE_INTEGER : b.storeOrder;
+              return aOrder - bOrder;
+            }).map((product) => {
               const productPrices = getSortedPrices(product.prices);
               const selectedPrice = selectedPrices[product.id] || null;
-              const displayPrice = productPrices.length === 1 ? productPrices[0] : selectedPrice;
               const activePrice = productPrices.length === 1 ? productPrices[0] : selectedPrice;
               const isSingleQuantityOnly = SINGLE_QUANTITY_PRODUCT_IDS.has(product.id);
               const isAlreadyInCart = activePrice
@@ -192,7 +208,7 @@ function Store() {
                                 : 'border-gray-700 text-gray-400 hover:border-gray-500'
                             }`}
                           >
-                            {price.label || `$${(price.priceCents / 100).toFixed(2)}`}
+                            {price.label || price.priceId}
                           </button>
                         );
                       })}
@@ -200,9 +216,7 @@ function Store() {
                   )}
                   <div className="flex items-center justify-between">
                     <span className="text-brand-orange font-bold text-lg">
-                      {displayPrice
-                        ? `$${(displayPrice.priceCents / 100).toFixed(2)}`
-                        : 'Select size'}
+                      {productPrices.length > 0 ? `$${(productPrices[0].priceCents / 100).toFixed(2)}` : ''}
                     </span>
                     <button
                       onClick={() => {
@@ -273,6 +287,7 @@ function Store() {
           </div>
         )}
       </main>
+      <SiteFooter />
     </div>
   );
 }

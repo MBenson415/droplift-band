@@ -36,6 +36,7 @@ app.http('products', {
           name: product.name,
           description: product.description,
           image: product.images?.[0] || null,
+          storeOrder: parseInt(product.metadata?.StoreOrder || '', 10),
           prices: productPrices,
         };
       });
